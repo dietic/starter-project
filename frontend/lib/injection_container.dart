@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:news_app_clean_architecture/features/daily_news/data/data_sources/remote/news_api_service.dart';
@@ -6,6 +7,14 @@ import 'package:news_app_clean_architecture/features/daily_news/data/repository/
 import 'package:news_app_clean_architecture/features/daily_news/domain/repository/article_repository.dart';
 import 'package:news_app_clean_architecture/features/daily_news/domain/usecases/get_article.dart';
 import 'package:news_app_clean_architecture/features/daily_news/presentation/bloc/article/remote/remote_article_bloc.dart';
+import 'package:news_app_clean_architecture/shared/auth/data/data_sources/firebase_auth_data_source.dart';
+import 'package:news_app_clean_architecture/shared/auth/data/repository/firebase_auth_repository.dart';
+import 'package:news_app_clean_architecture/shared/auth/domain/repository/auth_repository.dart';
+import 'package:news_app_clean_architecture/shared/auth/domain/usecases/sign_in.dart';
+import 'package:news_app_clean_architecture/shared/auth/domain/usecases/sign_out.dart';
+import 'package:news_app_clean_architecture/shared/auth/domain/usecases/sign_up.dart';
+import 'package:news_app_clean_architecture/shared/auth/domain/usecases/watch_auth_state.dart';
+import 'package:news_app_clean_architecture/shared/auth/presentation/bloc/auth_cubit.dart';
 import 'features/daily_news/data/data_sources/local/app_database.dart';
 import 'features/daily_news/domain/usecases/get_saved_article.dart';
 import 'features/daily_news/domain/usecases/remove_article.dart';
@@ -45,4 +54,19 @@ Future<void> initializeDependencies() async {
       () => LocalArticleBloc(sl(), sl(), sl()),
     );
   }
+
+  // Auth
+  sl.registerSingleton<FirebaseAuth>(FirebaseAuth.instance);
+  sl.registerSingleton<FirebaseAuthDataSource>(FirebaseAuthDataSource(sl()));
+  sl.registerSingleton<AuthRepository>(FirebaseAuthRepository(sl()));
+  sl.registerSingleton<SignInUseCase>(SignInUseCase(sl()));
+  sl.registerSingleton<SignUpUseCase>(SignUpUseCase(sl()));
+  sl.registerSingleton<SignOutUseCase>(SignOutUseCase(sl()));
+  sl.registerSingleton<WatchAuthStateUseCase>(WatchAuthStateUseCase(sl()));
+  sl.registerLazySingleton<AuthCubit>(() => AuthCubit(
+        signIn: sl(),
+        signUp: sl(),
+        signOut: sl(),
+        watchAuthState: sl(),
+      ));
 }
