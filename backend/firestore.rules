@@ -2,6 +2,40 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // TODO: WRITE ANY NECESSARY FIRESTORE RULES HERE
+
+    function isValidArticle(data) {
+      return data.keys().hasAll(['authorId', 'title', 'description', 'content', 'thumbnailUrl', 'thumbnailPath', 'publishedAt'])
+        && data.authorId is string
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 120
+        && data.description is string && data.description.size() >= 1 && data.description.size() <= 500
+        && data.content is string && data.content.size() >= 1 && data.content.size() <= 20000
+        && data.thumbnailUrl is string && data.thumbnailUrl.matches('https://.*')
+        && data.thumbnailPath is string && data.thumbnailPath.matches('media/articles/.*')
+        && data.publishedAt is timestamp
+        && (!('authorEmail' in data.keys()) || (data.authorEmail is string && data.authorEmail.size() <= 320));
+    }
+
+    match /articles/{articleId} {
+      allow read: if request.auth != null;
+
+      allow create: if request.auth != null
+        && request.resource.data.authorId == request.auth.uid
+        && isValidArticle(request.resource.data)
+        && request.resource.data.publishedAt == request.time;
+
+      allow update: if request.auth != null
+        && resource.data.authorId == request.auth.uid
+        && request.resource.data.authorId == resource.data.authorId
+        && request.resource.data.publishedAt == resource.data.publishedAt
+        && request.resource.data.thumbnailPath == resource.data.thumbnailPath
+        && isValidArticle(request.resource.data);
+
+      allow delete: if request.auth != null
+        && resource.data.authorId == request.auth.uid;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
 }
