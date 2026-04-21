@@ -1,6 +1,4 @@
-import 'package:equatable/equatable.dart';
-
-class UploadArticleParams extends Equatable {
+class UploadArticleParams {
   final String title;
   final String description;
   final String content;
@@ -14,8 +12,4 @@ class UploadArticleParams extends Equatable {
     required this.thumbnailBytes,
     required this.thumbnailFileName,
   });
-
-  @override
-  List<Object?> get props =>
-      [title, description, content, thumbnailBytes, thumbnailFileName];
 }

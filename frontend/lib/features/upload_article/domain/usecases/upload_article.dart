@@ -24,7 +24,8 @@ class UploadArticleUseCase
       throw const InvalidArticleException('Title is required.');
     }
     if (p.title.trim().length > 120) {
-      throw const InvalidArticleException('Title must be 120 characters or fewer.');
+      throw const InvalidArticleException(
+          'Title must be 120 characters or fewer.');
     }
     if (p.description.trim().isEmpty) {
       throw const InvalidArticleException('Description is required.');

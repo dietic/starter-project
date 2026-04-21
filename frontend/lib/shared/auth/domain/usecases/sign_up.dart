@@ -25,5 +25,10 @@ class SignUpUseCase implements UseCase<AuthUserEntity, AuthCredentials> {
     if (c.password.length < 6) {
       throw const WeakPasswordException();
     }
+    final name = c.displayName;
+    if (name != null && name.trim().length > 80) {
+      throw const AuthUnknownException(
+          'Display name must be 80 characters or fewer.');
+    }
   }
 }
