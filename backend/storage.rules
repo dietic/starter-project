@@ -12,7 +12,10 @@ service firebase.storage {
           request.resource == null
             || (
               request.resource.size < 5 * 1024 * 1024
-              && request.resource.contentType.matches('image/.*')
+              && (
+                request.resource.contentType == null
+                  || request.resource.contentType.matches('image/.*')
+              )
             )
         );
     }
@@ -26,7 +29,10 @@ service firebase.storage {
           request.resource == null
             || (
               request.resource.size < 5 * 1024 * 1024
-              && request.resource.contentType.matches('image/.*')
+              && (
+                request.resource.contentType == null
+                  || request.resource.contentType.matches('image/.*')
+              )
             )
         );
     }
