@@ -34,7 +34,7 @@ service cloud.firestore {
 
     function isValidReplyTarget(articleId, replyTo) {
       return exists(/databases/$(database)/documents/articles/$(articleId)/comments/$(replyTo))
-        && get(/databases/$(database)/documents/articles/$(articleId)/comments/$(replyTo)).data.replyTo == null
+        && get(/databases/$(database)/documents/articles/$(articleId)/comments/$(replyTo)).data.get('replyTo', null) == null
         && get(/databases/$(database)/documents/articles/$(articleId)/comments/$(replyTo)).data.isDeleted == false;
     }
 
