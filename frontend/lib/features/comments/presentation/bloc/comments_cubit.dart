@@ -44,9 +44,9 @@ class CommentsCubit extends Cubit<CommentsState> {
     );
   }
 
-  Future<void> submit(String articleId, String text, {String? replyTo}) async {
+  Future<bool> submit(String articleId, String text, {String? replyTo}) async {
     final current = state;
-    if (current is! CommentsLoaded) return;
+    if (current is! CommentsLoaded) return false;
     emit(current.copyWith(submitting: true, submitError: null));
     try {
       await _deps.addComment(
@@ -60,11 +60,13 @@ class CommentsCubit extends Cubit<CommentsState> {
       if (latest is CommentsLoaded) {
         emit(latest.copyWith(submitting: false));
       }
+      return true;
     } on CommentException catch (e) {
       final latest = state;
       if (latest is CommentsLoaded) {
         emit(latest.copyWith(submitting: false, submitError: e.message));
       }
+      return false;
     }
   }
 

@@ -33,12 +33,15 @@ class _CommentsSectionState extends State<CommentsSection> {
     super.dispose();
   }
 
-  void _submitTopLevel() {
+  Future<void> _submitTopLevel() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
-    context.read<CommentsCubit>().submit(widget.articleId, text);
-    _controller.clear();
-    _focusNode.unfocus();
+    final ok = await context.read<CommentsCubit>().submit(widget.articleId, text);
+    if (!mounted) return;
+    if (ok) {
+      _controller.clear();
+      _focusNode.unfocus();
+    }
   }
 
   @override
@@ -159,7 +162,7 @@ class _CommentThread extends StatefulWidget {
   final CommentEntity parent;
   final List<CommentEntity> replies;
   final String? currentUid;
-  final void Function(String text)? onReply;
+  final Future<bool> Function(String text)? onReply;
   final void Function(String commentId) onDelete;
   final bool submitting;
   final String? submitError;
@@ -190,12 +193,15 @@ class _CommentThreadState extends State<_CommentThread> {
     super.dispose();
   }
 
-  void _submitReply() {
+  Future<void> _submitReply() async {
     final text = _replyController.text.trim();
     if (text.isEmpty || widget.onReply == null) return;
-    widget.onReply!(text);
-    _replyController.clear();
-    setState(() => _showReply = false);
+    final ok = await widget.onReply!(text);
+    if (!mounted) return;
+    if (ok) {
+      _replyController.clear();
+      setState(() => _showReply = false);
+    }
   }
 
   @override
